@@ -46,9 +46,9 @@ class UserController {
                     user.save();
 
                     this.getTr(user, tr);
-                   
+
                     this.updateCount();
-                    
+
                     this.formUpdateEl.reset();
                     this.getButtonUpdate().disabled = false;
                     this.showPanelCreate();
@@ -171,35 +171,19 @@ class UserController {
         );
     }//Fechando o Método getVelues()
 
-    selectAll(){
+    selectAll() {
 
-        //let users = User.getUsersStorage();
+        HttpRequest.get('/users').then(data => {
 
-        let ajax = new XMLHttpRequest();
-
-        ajax.open('GET', '/users');
-
-        ajax.onload = (event) => {
-
-            let obj = { users: [] };
-
-            try{
-                obj = JSON.parse(ajax.responseText);                
-            }catch(e){
-                console.error(e);
-            }
-
-
-            obj.users.forEach(dataUser => {
+            data.users.forEach(dataUser => {
                 let user = new User();
-    
+
                 user.loadFromJSON(dataUser);
-    
+
                 this.addLine(user);
             });
-        }
 
-        ajax.send();
+        });
 
     }//Fechamento selectAll()
 
@@ -214,9 +198,9 @@ class UserController {
 
     }//Fechando o metodo addLine()
 
-    getTr(dataUser, tr = null){
+    getTr(dataUser, tr = null) {
 
-        if(tr === null) tr = document.createElement('tr');
+        if (tr === null) tr = document.createElement('tr');
 
         tr.dataset.user = JSON.stringify(dataUser);
 
@@ -241,7 +225,7 @@ class UserController {
 
         tr.querySelector(".btn-delete").addEventListener("click", (e) => {
 
-            if(confirm("Deseja realmente excluir?")){
+            if (confirm("Deseja realmente excluir?")) {
 
                 let user = new User();
 
