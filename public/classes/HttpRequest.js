@@ -25,14 +25,13 @@ class HttpRequest {
 
         return new Promise((resolve, reject) => {
 
-
             let ajax = new XMLHttpRequest();
 
             ajax.open(method.toUpperCase(), url);
 
             ajax.onerror = event => {
 
-                reject(e);
+                reject(event);
             }
 
             ajax.onload = (event) => {
@@ -52,8 +51,5 @@ class HttpRequest {
             ajax.send();
 
         });
-
-
-
     }
 }
