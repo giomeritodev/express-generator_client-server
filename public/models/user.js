@@ -1,6 +1,6 @@
 class User {
 
-    constructor(name, gender, birth, country, email, password, photo, admin){
+    constructor(name, gender, birth, country, email, password, photo, admin) {
         this._id;
         this._name = name;
         this._gender = gender;
@@ -13,71 +13,71 @@ class User {
         this._register = new Date();
     }
 
-    get id(){
+    get id() {
         return this._id;
     }
 
-    get name(){
+    get name() {
         return this._name;
     }
-    get gender(){
+    get gender() {
         return this._gender;
     }
-    get birth(){
+    get birth() {
         return this._birth;
     }
-    get country(){
+    get country() {
         return this._country;
     }
-    get email(){
+    get email() {
         return this._email;
     }
-    get password(){
+    get password() {
         return this._password;
     }
-    
-    get photo(){
+
+    get photo() {
         return this._photo;
     }
-    set photo(value){
+    set photo(value) {
         this._photo = value;
     }
 
-    get admin(){
+    get admin() {
         return this._admin;
     }
-    get register(){
+    get register() {
         return this._register;
     }
 
-    loadFromJSON(json){
-        for(let name in json){
-            switch(name){
+    loadFromJSON(json) {
+        for (let name in json) {
+            switch (name) {
                 case '_register':
                     this[name] = new Date(json[name]);
-                break;
-                
+                    break;
+
                 default:
-                this[name] = json[name];
+                    this[name] = json[name];
             }
         }
     }
 
-    static getUsersStorage(){
+    static getUsersStorage() {
         let users = [];
 
-        if(localStorage.getItem("users")){
+        if (localStorage.getItem("users")) {
             users = JSON.parse(localStorage.getItem("users"));
         }
 
         return users;
     }//Fechamento do getUsersStorage()
 
-    getNewId(){
+    getNewId() {
 
         let usersID = parseInt(localStorage.getItem("usersID"));
 
-        if(!usersID > 0) usersID = 0;
+        if (!usersID > 0) usersID = 0;
 
         usersID++;
 
@@ -87,34 +87,50 @@ class User {
 
     }//Fechamento getNewId()
 
-    save(){
 
-        let users = User.getUsersStorage();
+    toJSON() {
 
-        if(this.id > 0){
+        let json = {};
+
+        Object.keys(this).forEach(key => {
+            if (this[key] !== undefined) json[key] = this[key];
+        });
+
+        return json;
+
+    }//Fechamento do toJSON()
+
+    save() {
+        
+        return new Promise((resolve, reject) => {
+
+            let promise;
+
+            if (this.id) {
+                promise = HttpRequest.put(`/users/${this.id}`, this.toJSON());
+            } else {
+                promise = HttpRequest.post('/users', this.toJSON());
+            }
             
-            users.map(u => {
-
-                if(u._id == this.id){
-                    Object.assign(u, this);                    
-                }
-                return u;
+            promise.then(data => {
+                this.loadFromJSON(data);
+                resolve(this);
+            }).catch(e => {
+                reject(e);
+                console.error("Error aqui", e);
             });
-            
-        }else{
-            this._id = this.getNewId();
-            users.push(this);
-        }    
 
-        localStorage.setItem("users", JSON.stringify(users));
+        }).catch(e => {
+            console.error("Não foi possivel incluir o registro", e);
+        });
 
-    }//Fechamento do insert
+    };//Fechamento do save
 
-    remove(){
+    remove() {
         let users = User.getUsersStorage();
 
         users.forEach((userData, index) => {
-            if(this._id == userData._id){
+            if (this._id == userData._id) {
                 users.splice(index, 1);
             }
         });
