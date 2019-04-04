@@ -58,7 +58,9 @@ class User {
                     break;
 
                 default:
+                if(name.substring(0, 1) === '_'){
                     this[name] = json[name];
+                }
             }
         }
     }
@@ -120,8 +122,6 @@ class User {
                 console.error("Error aqui", e);
             });
 
-        }).catch(e => {
-            console.error("Não foi possivel incluir o registro", e);
         });
 
     };//Fechamento do save
